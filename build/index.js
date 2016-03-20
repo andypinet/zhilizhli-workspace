@@ -1,4 +1,6 @@
 var Sass = require("./sass");
+var Ts = require("./ts");
+var System = require("./system");
 
 var debounce = require('debounce');
 var exec = require('child_process').exec;
@@ -22,6 +24,8 @@ module.exports = function(injectors) {
     });
 
     Sass(injectors);
+    Ts(injectors);
+    System(injectors);
 
     injectors.gulp.task('build-angular-es', function(src, dest) {
         return injectors.gulp.src(src)
@@ -50,7 +54,6 @@ module.exports = function(injectors) {
         injectors.gulp.watch(injectors.paths.srcRoot + `${dest}/${name}.js`, zst(name, dest))
     });
 
-
     injectors.gulp.task("build-template", function(src, dest, name) {
         var mockdata = require('../' + injectors.paths.srcRoot + `mockdata/${name}`);
 
@@ -60,7 +63,7 @@ module.exports = function(injectors) {
                 basepath: '@file'
             }))
             .pipe(mustache(mockdata, {
-                tags: ['{{{', '}}}']
+                tags: ['<<<', '>>>']
             }))
             .pipe(template({
                 version: Date.now()
