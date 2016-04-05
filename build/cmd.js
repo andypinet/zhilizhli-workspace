@@ -1,3 +1,7 @@
+/**
+ * Created by tongguwei on 16/4/4.
+ */
+
 module.exports = function(injectors) {
     'use strict';
 
@@ -17,27 +21,28 @@ module.exports = function(injectors) {
         }
     });
 
-    let src = injectors.paths.srcRoot + '/lib/**/*.js';
-    let dest = injectors.paths.destRoot + '/lib/';
-    let watch = injectors.paths.srcRoot + '/lib/**/*.js';
-
-    var mtl = function() {
+    var mtl = function(name, dest) {
         "use strict";
 
+        let src = injectors.paths.srcRoot + `${dest}/${name}.js`;
+        let destpath = injectors.paths.destRoot + `${dest}`;
+
         return debounce(function(){
-            exec("gulp build-system", function(err, stdout, stderr) {
+            exec(`gulp build-cmd-js --src ${src} --dest ${destpath} `, function(err, stdout, stderr) {
                 console.log(stdout);
                 console.log(stderr);
             });
         }, 0);
     };
 
-    injectors.gulp.task("build-system", function() {
+    injectors.gulp.task("build-cmd-js", function(src, dest) {
         return injectors.gulp.src(src)
+            .pipe(es5)
             .pipe(injectors.gulp.dest(dest));
     });
 
-    injectors.gulp.task("watch-system", function() {
-        injectors.gulp.watch(watch, mtl());
+    injectors.gulp.task("watch-cmd-js", function(name, dest, watch) {
+        var watchpath = watch || "";
+        injectors.gulp.watch(watchpath, mtl(name, dest));
     });
 };
